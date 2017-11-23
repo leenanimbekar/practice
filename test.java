@@ -13,6 +13,9 @@ public class test {
             System.out.println(y);
             byte z = (byte)100L;
             System.out.println(z);
+            for(int i=0;;i++){
+                System.out.println(i);
+            }
         }
 }
 class Animal{
