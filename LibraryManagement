@@ -1,0 +1,176 @@
+import java.util.*;
+class Book{
+    String name;
+    String author;
+    int maxBooksAllowed;
+    int currentIssuedBooks;
+    Book(String name,String author,int maxBooksAllowed,int currentIssuedBooks){
+        this.name = name;
+        this.author = author;
+        this.maxBooksAllowed = maxBooksAllowed;
+        this.currentIssuedBooks = currentIssuedBooks;
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof Book)) {
+            return false;
+        }
+        Book c = (Book) o;
+        return name.equals(c.name) && author.equals(c.author);
+    }
+}
+class Users{
+    String name;
+    int id;
+    int booksBorrowed;
+    final static int MAXBOOKSALLOWED = 5;
+    Users(String name,int id,int booksBorrowed){
+        this.name = name;
+        this.id = id;
+        this.booksBorrowed = booksBorrowed;
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof Users)) {
+            return false;
+        }
+        Users c = (Users) o;
+        return name.equals(c.name) && Double.compare(id, c.id) == 0;
+    }
+}
+interface operations {
+    public ArrayList doOperation(ArrayList lst);
+}
+class addBooks implements operations{
+    Book book;
+    Users user;
+    addBooks(Book book){
+        this.book = book;
+        this.user = user;
+    }
+    @Override
+    public ArrayList<Book> doOperation(ArrayList lst) {
+        lst.add(book);
+        return lst;
+    }
+}
+
+class lendBooks implements operations{
+    Book book;
+    Users user;
+    lendBooks(Book book,Users user){
+       this.book = book;
+       this.user = user;
+    }
+    @Override
+    public ArrayList<Book> doOperation(ArrayList lst) {
+        if(book.currentIssuedBooks <= book.maxBooksAllowed && user.booksBorrowed <= user.MAXBOOKSALLOWED){
+            Book temp = book;
+            temp.currentIssuedBooks++;
+            user.booksBorrowed++;
+            lst.remove(book);
+            lst.add(temp);
+        }
+        return lst;
+    }
+}
+class returnBooks implements operations{
+    Book book;
+    Users user;
+    returnBooks(Book book,Users user){
+        this.book = book;
+        this.user = user;
+    }
+    @Override
+    public ArrayList<Book> doOperation(ArrayList lst) {
+        user.booksBorrowed--;
+        book.currentIssuedBooks--;
+        lst.remove(book);
+        return lst;
+    }
+}
+class searchBooks implements operations{
+    Book book;
+    searchBooks(Book book){
+        this.book = book;
+    }
+    @Override
+    public ArrayList<Book> doOperation(ArrayList lst) {
+        ArrayList newLst = new ArrayList();
+        Iterator it = lst.iterator();
+        while(it.hasNext()){
+            Book temp = (Book)it.next();
+            if(temp.name.equals(book.name) || temp.author.equals(book.author)){
+                newLst.add(temp);
+                break;
+            }
+        }
+        return newLst;
+    }
+}
+class searchUsers implements operations{
+    Users user;
+    searchUsers(Users user){
+        this.user = user;
+    }
+    @Override
+    public ArrayList<Users> doOperation(ArrayList lst) {
+        ArrayList newLst = new ArrayList();
+        Iterator it = lst.iterator();
+        while(it.hasNext()){
+            Users temp = (Users)it.next();
+            if(temp.name.equals(user.name) || temp.id == user.id){
+                newLst.add(temp);
+                break;
+            }
+        }
+        return newLst;
+    }
+}
+class addUsers implements operations{
+    Users user;
+    addUsers(Users user){
+        this.user = user;
+    }
+    @Override
+    public ArrayList<Users> doOperation(ArrayList lst) {
+        lst.add(user);
+        return lst;
+    }
+}
+class Context {
+    private operations op;
+
+    public Context(operations op){
+        this.op = op;
+    }
+
+    public ArrayList execute(ArrayList lst){
+        return op.doOperation(lst);
+    }
+}
+public class LibraryManagment {
+    public static void main(String args[]){
+
+        Context context = new Context(new addBooks(new Book("Book1","Author-Book1",5,0)));
+        ArrayList<Book> books = new ArrayList<Book>();
+        System.out.println("Add Books" + context.execute(books));
+        context = new Context(new addBooks(new Book("Book2","Author-Book2",5,0)));
+        System.out.println("Add Books" + context.execute(books));
+
+        ArrayList<Users> users = new ArrayList<Users>();
+        context = new Context(new addUsers(new Users("User1",1,0)));
+        System.out.println("Add Users" + context.execute(users));
+        context = new Context(new addUsers(new Users("User2",2,0)));
+        System.out.println("Add Users" + context.execute(users));
+
+        context = new Context(new lendBooks(new Book("Book2","Author-Book2",5,0),new Users("User1",1,0)));
+        System.out.println("Add Books" + context.execute(books));
+    }
+}
